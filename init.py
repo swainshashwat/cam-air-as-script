@@ -1,11 +1,17 @@
 import math
-
+import sys
 import cv2
-import numpy as np 
+import scipy.misc
+import numpy as np
 import random
 from collections import deque
 
-camera = cv2.VideoCapture(0)
+from my_preprocess import main_preprocess
+from keras.models import load_model
+
+# terminal arguments
+arguments = sys.argv[1:]
+count_arg = len(arguments)
 
 # initializing result deque
 center_points = deque()
@@ -16,6 +22,16 @@ upper_blue = np.array([160, 255, 255])
 
 # blank window
 paintWindow = np.zeros((471, 636, 3)) + 255
+
+# font
+font = cv2.FONT_HERSHEY_SCRIPT_SIMPLEX
+
+# loading the deep-learning model
+print('Loading the DL model...')
+model = load_model('DeepLearning/bn_model_02.h5')
+
+# initializing the camera
+camera = cv2.VideoCapture(0)
 
 while True:
     # Read and flip frame
@@ -82,9 +98,15 @@ while True:
         
         if center_of_two_points <= 50:
             paintWindow = cv2.line(paintWindow, center_points[i-1], center_points[i],
-                pointer_color, thickness=4)
+                pointer_color, thickness=10)
 
-   # clear the paintWindow
+    # preprocessing image
+    processed_image = main_preprocess(scipy.misc.toimage(paintWindow))
+    predict = model.predict_classes(processed_image)
+
+    cv2.putText(frame,str(predict),(10,40), font, 1,(0,10,255),2,cv2.LINE_AA)
+
+    # clear the paintWindow
     if cv2.waitKey(1) == ord("c"):
         print('clearing the window...')
         center_points = deque()
@@ -92,9 +114,16 @@ while True:
     cv2.imshow('original', frame)
     cv2.imshow('paintWindow', paintWindow)
 
+
+
     # press 'q' to Quit
     if cv2.waitKey(1) & 0xFF == ord("q"):
         print('closing...')
+        if count_arg!=0:
+            image_name = sys.argv[1]
+            print('saving... '+image_name)
+            cv2.imwrite(image_name+'.jpg', paintWindow)
+        
         break
 
     
