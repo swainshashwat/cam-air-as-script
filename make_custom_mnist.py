@@ -86,7 +86,7 @@ while True:
         
         if center_of_two_points <= 50:
             paintWindow = cv2.line(paintWindow, center_points[i-1], center_points[i],
-                pointer_color, thickness=10)
+                pointer_color, thickness=20)
 
     # clear the paintWindow
     if cv2.waitKey(1) == ord("c"):

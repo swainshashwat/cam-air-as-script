@@ -92,7 +92,7 @@ while True:
         
         if center_of_two_points <= 50:
             paintWindow = cv2.line(paintWindow, center_points[i-1], center_points[i],
-                pointer_color, thickness=7)
+                pointer_color, thickness=23)
 
     # preprocessing image
     processed_image = main_preprocess(scipy.misc.toimage(paintWindow))
